@@ -1,15 +1,39 @@
-const Routine = require('../models/Routine')
+const Workout = require('../models/Workout')
 const router = require('express').Router()
 
 
 router.get('/api/workouts', async (req, res) => {
-    res.json({ message: 'Route hit' })
+    const allWorkouts = await Workout.find()
+    let aggWorkout = allWorkouts.map(workout => {
+        let totalDuration = 0
+        workout.exercises.forEach(exercise => {
+            totalDuration += exercise.duration
+        })
+        return { ...workout._doc, totalDuration }
+    })
 
+    console.log(aggWorkout)
+    res.json(aggWorkout)
 })
 
 router.get('/api/workouts/range', async (req, res) => {
-    res.json({ message: 'Route hit' })
+    try {
+        const workouts = await Workout.find({}).limit(7)
 
+        let aggWorkout = workouts.map(workout => {
+            let totalDuration = 0
+            workout.exercises.forEach(exercise => {
+                totalDuration += exercise.duration
+            })
+            return { ...workout._doc, totalDuration }
+        })
+
+        console.log(aggWorkout)
+        res.json(aggWorkout)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json(error)
+    }
 })
 
 router.put('/api/workouts/:_id', async (req, res) => {
@@ -21,12 +45,12 @@ router.put('/api/workouts/:_id', async (req, res) => {
 
         if (type === 'cardio') {
             const { distance, name, duration } = req.body
-            const newCardio = await Routine.findOneAndUpdate({ _id }, { exercises: { type, distance, name, duration } } )
+            const newCardio = await Workout.findOneAndUpdate({ _id }, { $push: { exercises: { type, distance, name, duration } } }, { new: true, rawResult: true })
             // console.log(newCardio)
             res.json(newCardio)
         } else {
-            const { distance, name, duration } = req.body
-            const newResistance = await Routine.findOneAndUpdate({ _id }, { exercises: { type, distance, name, duration } })
+            const { weight, sets, reps, name, duration } = req.body
+            const newResistance = await Workout.findOneAndUpdate({ _id }, { $push: { exercises: { type, weight, name, duration, sets, reps } } }, { new: true, rawResult: true })
             res.json(newResistance)
         }
     } catch (err) {
@@ -38,9 +62,8 @@ router.put('/api/workouts/:_id', async (req, res) => {
 router.post('/api/workouts', async (req, res) => {
 
     try {
-
-        const newRoutine = await Routine.create({})
-        res.json(newRoutine)
+        const newWorkout = await Workout.create({})
+        res.json(newWorkout)
 
     } catch (err) {
 

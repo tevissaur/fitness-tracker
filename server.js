@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const morgan = require('morgan')
 const path =  require('path')
 const routes = require('./routes/api')
-const Routine = require('./models/Routine')
+const Workout = require('./models/Workout')
 
 const PORT = 3001
 const app = express()
@@ -16,6 +16,7 @@ app.use(express.static("public"));
 
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/fitnesstrackerdb", 
 {
+    autoIndex: false,
     useNewUrlParser: true, 
     useFindAndModify: false
 });
