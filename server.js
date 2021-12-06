@@ -5,7 +5,7 @@ const path =  require('path')
 const routes = require('./routes/api')
 const Workout = require('./models/Workout')
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 const app = express()
 
 app.use(morgan('dev'))
