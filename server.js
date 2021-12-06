@@ -1,7 +1,9 @@
 const express = require('express')
-const mongojs = require('mongojs')
 const mongoose = require('mongoose')
 const morgan = require('morgan')
+const path =  require('path')
+const routes = require('./routes/api')
+const Routine = require('./models/Routine')
 
 const PORT = 3001
 const app = express()
@@ -12,11 +14,19 @@ app.use(express.json())
 
 app.use(express.static("public"));
 
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/userdb", { useNewUrlParser: true });
-
-const db = mongojs('fitnesstrackerdb', ["workout"])
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/fitnesstrackerdb", 
+{
+    useNewUrlParser: true, 
+    useFindAndModify: false
+});
+const db = mongoose.connection
 
 db.on('error', error => console.log('DB Error', error))
+
+app.use('/stats', express.static(path.join(__dirname, 'public/stats.html')))
+app.use('/exercise', express.static(path.join(__dirname, 'public/exercise.html')))
+
+app.use(routes)
 
 
 app.listen(PORT, () => console.log(`Listening on http://localhost:${PORT}`))

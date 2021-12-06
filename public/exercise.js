@@ -25,6 +25,7 @@ async function initExercise() {
     console.log(workout)
   }
   if (workout) {
+    console.log(workout)
     location.search = "?id=" + workout._id;
   }
 
@@ -113,7 +114,7 @@ async function handleFormSubmit(event) {
     workoutData.reps = Number(repsInput.value.trim());
     workoutData.duration = Number(resistanceDurationInput.value.trim());
   }
-
+  
   await API.addExercise(workoutData);
   clearInputs();
   toast.classList.add("success");
